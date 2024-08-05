@@ -1,0 +1,21 @@
+{
+  "name": "codingrooms",
+  "version": "1.0.0",
+  "description": "Realtime chatroom",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server",
+    "dev":"nodemon server",
+    "build":"npm install"
+  },
+  "author": "Dinesh Maddi",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "moment": "^2.30.1",
+    "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
