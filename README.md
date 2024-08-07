@@ -11,9 +11,7 @@ Anonymous Coding Rooms is a platform where students can collaborate on coding ta
 - 📋 **Temporary Discussions:** All messages disappear when you leave the room.
 
 ## 🛠️ Tech Stack
-
-- **Backend:** Java/Spring Boot
-- **Frontend:** Angular
+- **Frontend:** Angular, HTML, CSS, JavaScript
 - **Real-Time Communication:** Socket.IO, WebRTC
 - **Libraries:** JSCDN
 - **Server:** Node.js, Express.js
