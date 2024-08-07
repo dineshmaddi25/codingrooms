@@ -39,9 +39,7 @@ const chatform = document.getElementById('chat-form');
 const chatMessages = document.querySelector('.chat-messages');
 const roomName = document.getElementById('room-name');
 const userList = document.getElementById('users');
-const { username, room } = Qs.parse(location.search, {
-    ignoreQueryPrefix: true
-});
+const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true });
 const socket = io();
 
 // Join chatroom
@@ -57,7 +55,41 @@ socket.on('roomUsers', ({ room, users }) => {
 socket.on('message', message => {
     console.log(message);
     outputMessage(message);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    scrollToBottom();
+});
+
+// Image upload handling
+const imageUpload = document.getElementById('image-upload');
+document.getElementById('image-upload-btn').addEventListener('click', () => {
+    imageUpload.click();
+});
+imageUpload.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const img = new Image();
+            img.src = reader.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const maxWidth = 500;
+                const scaleSize = maxWidth / img.width;
+                canvas.width = maxWidth;
+                canvas.height = img.height * scaleSize;
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const resizedImage = canvas.toDataURL('image/jpeg');
+                socket.emit('imageUpload', resizedImage);
+            };
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Listen for image messages from server
+socket.on('imageMessage', image => {
+    outputImage(image);
+    scrollToBottom();
 });
 
 // Message submit
@@ -75,6 +107,22 @@ chatform.addEventListener('submit', (e) => {
     e.target.elements.msg.focus();
 });
 
+// Voice input
+document.getElementById('voice-input-btn').addEventListener('click', () => {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'en-US';
+    recognition.start();
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        socket.emit('chatMessage', transcript);
+    };
+
+    recognition.onerror = (event) => {
+        console.error(event.error);
+    };
+});
+
 // Output message to DOM
 function outputMessage(message) {
     const div = document.createElement('div');
@@ -82,6 +130,19 @@ function outputMessage(message) {
     div.innerHTML = `<p class="meta">${message.username} <span>${message.time}</span></p>
                      <p class="text">${message.text}</p>`;
     document.querySelector('.chat-messages').appendChild(div);
+}
+
+// Output image to DOM
+function outputImage(image) {
+    const div = document.createElement('div');
+    div.classList.add('message');
+    div.innerHTML = `<img src="${image}" style="max-width: 100%; border-radius: 10px;">`;
+    document.querySelector('.chat-messages').appendChild(div);
+}
+
+// Scroll to bottom
+function scrollToBottom() {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 // Add room name to DOM
