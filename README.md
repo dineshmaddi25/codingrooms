@@ -22,7 +22,6 @@ Anonymous Coding Rooms is a platform where students can collaborate on coding ta
 
 - Node.js
 - npm
-- Java
 - Angular CLI
 ### Version
 Current Version: coding-rooms-1.1
